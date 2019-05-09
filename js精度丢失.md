@@ -55,4 +55,5 @@ ps：之前一直用`toFixed()`来保留精度，`toFixed()`其实很坑:
 ## 参考文章
 
 [1][深入理解 javascript 中的精度丢失](https://juejin.im/post/5b20cbb051882513ac20354f)
+
 [2][js中小数四舍五入和浮点数的研究](http://caibaojian.com/js-tofixed.html)
