@@ -7,5 +7,67 @@
  
  这倒是激起了我的学习热情，想起了自己春招的时候在学校里学习，每天都是看到啥都不懂的状态，经常撸起袖子一个知识点就研究个两三天。于是这一次，我也撸起了袖子，好好研究起了这些加载脚本和 AMD 包。
  
- # 加载脚本
-  如果要写一个加载 AMD
+ 
+# 模块规范
+  一个 AMD 包的打包规范如下： 
+```javascript
+// 参数：模块名，依赖列表，模块体
+define('index', [ 'node_modules/foo/index', 'node_modules/foo/src/bar' ], function (foo, bar) { 
+    console.log(foo, bar);
+})
+```
+
+  按照 AMD 规范打出来的包也差不多，会在经过 webpack 编译的文件外加一层立即执行函数： 
+```javascript
+!(function(root, factory) {
+  // es6 module 规范
+  "object" == typeof exports && "object" == typeof module
+    ? (module.exports = factory(
+        require(void 0),
+        require(void 0),
+        require(void 0)
+      ))
+    // AMD 规范
+    : "function" == typeof define && define.amd
+    ? define("oui-editor-string", [
+        "vendor/react@15.5.4",
+        "card/color@1.1.7",
+        "vendor/react-dom@15.5.4"
+      ], factory)
+    : "object" == typeof exports
+    // CommomJS 规范
+    : "object" == typeof exports
+    : "object" == typeof exports
+    ? (exports["oui-editor-string"] = factory(
+        require(void 0),
+        require(void 0),
+        require(void 0)
+      ))
+    : ((root.$card = root.$card || {}),
+      (root.$card["oui-editor-string"] = factory(
+        root[void 0],
+        root[void 0],
+        root[void 0]
+      )));
+})(this, function(
+  __WEBPACK_EXTERNAL_MODULE_0__,
+  __WEBPACK_EXTERNAL_MODULE_17__,
+  __WEBPACK_EXTERNAL_MODULE_174__
+){
+// webpack 模块
+  return (function(modules){
+
+    function __webpack_require__(moduleId) {
+      // ...
+    }
+    // ...
+  })([
+    // webpack 模块列表
+  ])
+});
+```
+  浏览器拿到这个 AMD 包之后，会在上下文中找 define 函数来处理这个模块，define 文件遵守 AMD 模块规范，但有时候会缺失参数。
+ 
+# 加载脚本
+  如果要写一个加载 AMD 的脚本，我们需要做什么？
+  已知 AMD 脚本会包一层
