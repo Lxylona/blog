@@ -16,6 +16,18 @@ define('index', [ 'node_modules/foo/index', 'node_modules/foo/src/bar' ], functi
     console.log(foo, bar);
 })
 ```
+  来看看 define 函数的定义： 
+```javascript
+/**
+ *
+ * @param id?: string 模块名
+ * @param dependencies?: string[] 依赖
+ * @param factory: function 工厂方法，为模块初始化要执行的函数或对象。它应该只被执行一次。如果是对象，此对象应该为模块的输出值。
+ */
+define(id?, dependencies?, factory);
+```
+  注意 define 函数必须有一个属性 amd，define.amd 为一个对象，它表示这个 define 函数是遵守 AMD 规范的，这算是一个双重保障，确保这个 define 函数确实是用来处理这个 AMD 包的，而不是一个不知道从哪来的野鸡函数。amd 的属性可以随意扩展。
+  具体看文献： [AMD 规范](https://github.com/amdjs/amdjs-api/wiki/AMD-(%E4%B8%AD%E6%96%87%E7%89%88))
 
   按照 AMD 规范打出来的包也差不多，会在经过 webpack 编译的文件外加一层立即执行函数： 
 ```javascript
@@ -27,7 +39,7 @@ define('index', [ 'node_modules/foo/index', 'node_modules/foo/src/bar' ], functi
         require(void 0),
         require(void 0)
       ))
-    // AMD 规范
+    // AMD 规范, 确认 requireJS 是否存在
     : "function" == typeof define && define.amd
     ? define("oui-editor-string", [
         "vendor/react@15.5.4",
@@ -67,7 +79,7 @@ define('index', [ 'node_modules/foo/index', 'node_modules/foo/src/bar' ], functi
 });
 ```
   浏览器拿到这个 AMD 包之后，会在上下文中找 define 函数来处理这个模块，define 文件遵守 AMD 模块规范，但有时候会缺失参数。
-  注意这里做了一个双重保障，只有当 define 函数存在，且 define.amd 不为空的时候，才会用 define 才处理模块。
+
  
 # 加载脚本
   如果要写一个加载 AMD 的脚本，需要做什么？
@@ -118,3 +130,5 @@ function load(
 ```
 
 @todo： 1. 才想 requireJS 也是差不多这种机制， 再看看，2. 另外要实现缓存机制， 3.打包后怎么用,  4. webpack 包，
+
+
