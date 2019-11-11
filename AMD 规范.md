@@ -67,7 +67,54 @@ define('index', [ 'node_modules/foo/index', 'node_modules/foo/src/bar' ], functi
 });
 ```
   浏览器拿到这个 AMD 包之后，会在上下文中找 define 函数来处理这个模块，define 文件遵守 AMD 模块规范，但有时候会缺失参数。
+  注意这里做了一个双重保障，只有当 define 函数存在，且 define.amd 不为空的时候，才会用 define 才处理模块。
  
 # 加载脚本
-  如果要写一个加载 AMD 的脚本，我们需要做什么？
-  已知 AMD 脚本会包一层
+  如果要写一个加载 AMD 的脚本，需要做什么？
+  已知 AMD 脚本会包一层来执行 define 函数，所以必须保证上下文有一个行为符合预期的 define 函数。
+```javascript
+function load(
+  url: string
+): Promise<{
+  cdnSpecs: string[];
+  factory: any;
+  src: string;
+}> {
+  return new Promise(resolve => {
+    fetch(url).then(res => {
+      res.text().then(data => {
+        new Function(
+          "cb",
+          `
+        // 定义 define 函数
+        function define(name, cdnSpecs, factory){
+          if (!cdnSpecs && !factory) {
+            factory = name;
+            cdnSpecs = [];
+          }
+
+          if (typeof name === "object") {
+            factory = cdnSpecs;
+            cdnSpecs = name;
+            name = null;
+          }
+          // 这里传入回调函数，可以把该模块的依赖、模块主体和加载的 cdn 地址存起来
+          cb({
+            cdnSpecs,
+            factory,
+            src: "${url}"
+          })   
+        };
+        // 让 define.amd 不为空
+        define.amd = () => {};
+        // 这里是 AMD 包，实际上会执行上面定义的 define 函数
+        ${data}
+      `
+        )(resolve);
+      });
+    });
+  });
+}
+```
+
+@todo： 才想 requireJS 也是差不多这种机制， 再看看，另外要实现缓存机制
