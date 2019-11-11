@@ -28,7 +28,7 @@ define(id?, dependencies?, factory);
 ```
   注意 define 函数必须有一个属性 amd，define.amd 为一个对象，它表示这个 define 函数是遵守 AMD 规范的，这算是一个双重保障，确保这个 define 函数确实是用来处理这个 AMD 包的，而不是一个不知道从哪来的野鸡函数。amd 的属性可以随意扩展。
   你可以基于 amd 扩展一些能力，比如 jQuery 可以定义 `define.amd = {jQuery: true}`, 这样 jQuery 只有在监测到 `amd.jQuery` 的时候才会调用 define，新版本 jQuery 不再使用这个 flag 所以这个 flag 主要用于兼容老版本 jQuery。
-  
+  ![registering jQuery as an AMD module](https://github.com/Lxylona/blog/blob/master/images/defineamd.png)
   具体看文献： [AMD 规范](https://github.com/amdjs/amdjs-api/wiki/AMD-(%E4%B8%AD%E6%96%87%E7%89%88))
 
   按照 AMD 规范打出来的包也差不多，会在经过 webpack 编译的文件外加一层立即执行函数： 
