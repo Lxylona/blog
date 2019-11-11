@@ -117,4 +117,4 @@ function load(
 }
 ```
 
-@todo： 才想 requireJS 也是差不多这种机制， 再看看，另外要实现缓存机制
+@todo： 1. 才想 requireJS 也是差不多这种机制， 再看看，2. 另外要实现缓存机制， 3.打包后怎么用,  4. webpack 包，
